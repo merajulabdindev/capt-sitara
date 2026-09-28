@@ -53,7 +53,7 @@ async function gemini(prompt: string, system: string | undefined, think: boolean
       generationConfig: {
         responseMimeType: 'application/json', temperature: think ? 0.2 : 0.9, maxOutputTokens: 8192,
         // only 2.5+/3 models understand thinkingConfig; "pro" models cannot switch thinking off
-        ...(/gemini-(2\.5|3)/.test(model) ? { thinkingConfig: { thinkingBudget: think ? 2048 : (/pro/.test(model) ? 512 : 0) } } : {}),
+        ...(/gemini-(2\.5|3)/.test(model) && !/lite/.test(model) ? { thinkingConfig: { thinkingBudget: think ? 2048 : (/pro/.test(model) ? 512 : 0) } } : {}),
       },
     });
   const parts = j?.candidates?.[0]?.content?.parts;
