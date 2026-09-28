@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Shell from '@/components/Shell';
+import Hero from '@/components/Hero';
+import Scenes from '@/components/Scenes';
 import { sb, CAT, ISSB_MSG } from '@/lib/supabase';
 
 const LABEL: Record<string, string> = { not_started: 'Not started', in_progress: 'In progress', submitted: 'Completed', timed_out: 'Completed' };
@@ -40,10 +42,14 @@ export default function Dashboard() {
   const admin = role === 'admin';
   return (
     <Shell>
-      <h1>{admin ? 'Administrator Dashboard' : 'Daily Practice'}</h1>
-      <p className="muted">{st.date} (Pakistan time) &nbsp;|&nbsp; Completed today: <b>{st.done_count}/4</b> &nbsp;|&nbsp; Current streak: <b>{streak} day{streak === 1 ? '' : 's'}</b></p>
+      <Hero title={admin ? 'Administrator Dashboard' : 'Assalamu alaikum, Captain \u2728'} sub={admin ? 'Keep her journey on track, inshaAllah.' : 'Bismillah. Today\u2019s practice awaits.'} />
+      <div className="stats">
+        <svg className="ring" viewBox="0 0 80 80"><circle cx="40" cy="40" r="32" fill="#14284b" stroke="#dfe3ea" strokeWidth="8" /><circle cx="40" cy="40" r="32" fill="none" stroke="#e8b84a" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${(st.done_count / 4) * 201} 201`} transform="rotate(-90 40 40)" /><text x="40" y="47" textAnchor="middle">{st.done_count}/4</text></svg>
+        <p className="muted">{st.date} (Pakistan time) &nbsp;|&nbsp; Streak: <b>{streak} day{streak === 1 ? '' : 's'} {streak > 0 ? '\ud83d\udd25' : ''}</b></p>
+      </div>
       {msg && <div className="note">{msg}</div>}
       {!admin && <div className="note">Your administrator can see your scores, timing, answers and mistakes.</div>}
+      {!admin && <Scenes />}
       <div className="grid">
         {Object.keys(CAT).map((c) => {
           const s = st.slots[c]; const done = s.status === 'submitted' || s.status === 'timed_out';

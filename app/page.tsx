@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { sb } from '@/lib/supabase';
+import Hero from '@/components/Hero';
 export default function Login() {
   const r = useRouter(); const [u, setU] = useState(''); const [p, setP] = useState(''); const [err, setErr] = useState('');
   async function go(e: React.FormEvent) {
@@ -10,10 +11,9 @@ export default function Login() {
     if (error) setErr('Invalid username or password.'); else r.replace('/dashboard');
   }
   return (
-    <main style={{ maxWidth: 440, paddingTop: 70 }}>
+    <main style={{ maxWidth: 480, marginTop: 50 }}>
       <div className="card">
-        <h1>Capt Sitara</h1>
-        <p className="muted">Pakistan Army Initial-Test Daily Practice Platform. Please sign in.</p>
+        <Hero title="Capt Sitara" sub="Pakistan Army Initial-Test Daily Practice" />
         <form onSubmit={go}>
           <label>Username</label><input value={u} onChange={(e) => setU(e.target.value)} autoComplete="username" required />
           <label>Password</label><input type="password" value={p} onChange={(e) => setP(e.target.value)} autoComplete="current-password" required />
