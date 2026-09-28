@@ -1,9 +1,19 @@
-name: cron
+name: generate
 on:
-  schedule: [{ cron: '*/10 * * * *' }]
+  schedule: [{ cron: '*/20 * * * *' }]
   workflow_dispatch:
 jobs:
-  tick:
+  fill:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
-      - run: curl -fsS -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ secrets.APP_URL }}/api/cron"
+      - name: Call /api/generate until the bank is full
+        run: |
+          for i in $(seq 1 25); do
+            out=$(curl -sS -m 100 -w '\n%{http_code}' -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ secrets.APP_URL }}/api/generate") || { echo "request failed"; exit 1; }
+            code=$(echo "$out" | tail -n 1); body=$(echo "$out" | sed '$d')
+            echo "round $i [$code] $body"
+            [ "$code" = "200" ] || exit 1
+            echo "$body" | grep -Eq '"done":true|"paused":true' && exit 0
+            echo "$body" | grep -Eq '"busy":true|"rateLimited":true' && sleep 60
+          done
